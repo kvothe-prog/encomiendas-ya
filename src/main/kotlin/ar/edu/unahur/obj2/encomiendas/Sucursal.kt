@@ -62,8 +62,8 @@ open class Region(var tipo: RegionTipo) {
     open lateinit var listaProvincia: MutableList<String>
 }
 class Insular(tipo: RegionTipo = RegionTipo.INSULAR): Region(tipo) {
-    override var listaProvincia : MutableList<String> = mutableListOf("Malvinas", "Ushuaia", "la Base Marambio")
+    override var listaProvincia : MutableList<String> = mutableListOf("Malvinas", "Ushuaia", "la Base Marambio", "Antártida" )
 }
 class Continental(tipo: RegionTipo = RegionTipo.CONTINENTAL): Region(tipo) {
-    override var listaProvincia : MutableList<String> = mutableListOf("Córdoba", "Jujuy")
+    override var listaProvincia : MutableList<String> = mutableListOf("Córdoba", "Jujuy", "Buenos Aires", "Rosario")
 }
