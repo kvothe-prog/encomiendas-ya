@@ -48,7 +48,8 @@ abstract class Vehiculo(
         }
         return resultado
     }
-    fun puedeLlevar(unEnvio: Envio): Boolean{
+
+    open fun puedeLlevar(unEnvio: Envio): Boolean{
        return  tienePesoPermitido(unEnvio) && tieneVolumenPermitido(unEnvio) && tieneMismoDestinoQue(unEnvio) && tieneDistanciaPermitida(unEnvio) && estaEnRegion(unEnvio)
     }
 }
@@ -70,6 +71,10 @@ class Moto(
     override fun distanciaDe(unEnvio: Envio) : Double = unEnvio.origen.distanciaTierra(unEnvio.destino)
     override fun seDesplazaEn() : MutableList<Region> = mutableListOf(Continental())
     override fun tieneDistanciaPermitida(unEnvio: Envio) : Boolean = distanciaDe(unEnvio) <= 400
+
+    override fun puedeLlevar(unEnvio: Envio): Boolean{
+        return super.puedeLlevar(unEnvio) && !unEnvio.esPeligroso()
+    }
 }
 class Camion(
     kilometros: Int,
@@ -101,9 +106,16 @@ class Avion(
     override fun pesoMaximo(): Double = 10000.0
     override fun costo(unEnvio: Envio) : Double = if(unEnvio.pesoDeclarado() <= 1500.0) {2000.0} else { 2500.0 } * distanciaDe(unEnvio)
 
-    private fun cantidadDePeligrosos() = enviosCargados.count{it.esPeligroso()}
+    private fun cantidadDePeligrosos(): Int {
+        var cantidadArticulosPeligrosos = 0
+        enviosCargados.forEach { it.paquetesCargados.forEach { if(it.peligroso){cantidadArticulosPeligrosos ++} } }
+        return  cantidadArticulosPeligrosos
+    }
     override fun distanciaDe(unEnvio: Envio) : Double = unEnvio.origen.distanciaDirecta(unEnvio.destino)
     override fun seDesplazaEn() : MutableList<Region> = mutableListOf(Insular(), Continental())
+    override fun puedeLlevar(unEnvio: Envio): Boolean {
+        return super.puedeLlevar(unEnvio) && unEnvio.paquetesCargados.count { it.peligroso } <= 10
+    }
 
 }
 class Buque(
@@ -122,4 +134,7 @@ class Buque(
     override fun distanciaDe(unEnvio: Envio) : Double = unEnvio.origen.distanciaDirecta(unEnvio.destino)
     override fun costo(unEnvio: Envio) : Double = if(unEnvio.pesoDeclarado() <= 1500.0) {200.0} else { 250.0 } * distanciaDe(unEnvio)
     override fun seDesplazaEn() : MutableList<Region> = mutableListOf(Continental(),Insular())
+    override fun puedeLlevar(unEnvio: Envio): Boolean {
+        return super.puedeLlevar(unEnvio) && unEnvio.paquetesCargados.count { it.peligroso } <= 100
+    }
 }
